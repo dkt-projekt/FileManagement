@@ -12,7 +12,7 @@ public class FileFactory {
 	
 	public static File generateFileInstance(String path) throws IOException {
 		
-		try{
+		try{ 
 			//Test if it is http file
 			if(path.startsWith("http")){
 				UrlResource ur = new UrlResource(path);
