@@ -45,6 +45,9 @@ public class FileFactory {
 						return fsr.getFile();
 					}
 					else{
+						if(path.startsWith("/") || path.charAt(1)==':'){
+							return null;
+						}
 						//Network storage
 						UrlResource ur = new UrlResource(path);
 						if(ur!=null && ur.exists()){
