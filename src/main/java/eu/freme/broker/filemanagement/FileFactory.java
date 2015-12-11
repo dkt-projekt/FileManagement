@@ -7,6 +7,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
 
+import eu.freme.broker.filemanagement.exceptions.FileNotFoundException;
+
 public class FileFactory {
 
 	
@@ -63,6 +65,125 @@ public class FileFactory {
 		catch(IOException e){
 			e.printStackTrace();
 			throw e;
+		}
+	}
+	
+	public static File generateOrCreateFileInstance(String path) throws IOException {
+		try{ 
+			File f = generateFileInstance(path);
+			if(f==null || !f.exists()){
+				throw new FileNotFoundException("File not found");
+			}
+			return f;
+		}
+		catch(Exception e){
+			
+			//Parent folder
+			String parentPath = path.substring(0,path.lastIndexOf(File.separator)+1);
+			
+			if(path.startsWith("http")){
+				//TODO HTTP file generation not implemented yet.
+				throw new IOException("HTTP file generation not implemented yet.");
+			}
+			else if(path.startsWith("ftp")){
+				//TODO FTP file generation not implemented yet.
+				throw new IOException("FTP file generation not implemented yet.");
+			}
+			else{
+				//The rest of the possibilities: classpath, filesystem or network storage
+				ClassPathResource cpr = new ClassPathResource(parentPath);
+				if(cpr!=null && cpr.exists()){
+					File newFile = new File(cpr.getFile(),path.substring(path.lastIndexOf(File.separator)));
+					newFile.createNewFile();
+					return newFile;
+				}
+				else{
+					FileSystemResource fsr = new FileSystemResource(path);
+					if(fsr!=null && fsr.exists()){
+						File newFile = new File(fsr.getFile(),path.substring(path.lastIndexOf(File.separator)));
+						newFile.createNewFile();
+						return newFile;
+					}
+					else{
+						if(path.startsWith("/") || path.charAt(1)==':'){
+							throw new IOException("Parent folder not found for creating the file.");
+						}
+						//Network storage
+						UrlResource ur = new UrlResource(parentPath);
+						if(ur!=null && ur.exists()){
+							File newFile = new File(ur.getFile(),path.substring(path.lastIndexOf(File.separator)));
+							newFile.createNewFile();
+							return newFile;
+						}
+						else{
+							throw new IOException("Network file not found or not accesible.");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static File generateOrCreateDirectoryInstance(String path) throws IOException {
+		try{ 
+			File f = generateFileInstance(path);
+			if(f==null || !f.exists()){
+				throw new FileNotFoundException("File not found");
+			}
+			return f;
+		}
+		catch(Exception e){
+			
+			//Parent folder
+			String parentPath;
+			if(path.endsWith(File.separator)){
+				path = path.substring(0, path.length()-1);
+				parentPath = path.substring(0,path.lastIndexOf(File.separator)+1);
+			}
+			else{
+				parentPath = path.substring(0,path.lastIndexOf(File.separator)+1);
+			}
+			
+			if(path.startsWith("http")){
+				//TODO HTTP file generation not implemented yet.
+				throw new IOException("HTTP file generation not implemented yet.");
+			}
+			else if(path.startsWith("ftp")){
+				//TODO FTP file generation not implemented yet.
+				throw new IOException("FTP file generation not implemented yet.");
+			}
+			else{
+				//The rest of the possibilities: classpath, filesystem or network storage
+				ClassPathResource cpr = new ClassPathResource(parentPath);
+				if(cpr!=null && cpr.exists()){
+					File newFile = new File(cpr.getFile(),path.substring(path.lastIndexOf(File.separator)));
+					newFile.mkdir();
+					return newFile;
+				}
+				else{
+					FileSystemResource fsr = new FileSystemResource(path);
+					if(fsr!=null && fsr.exists()){
+						File newFile = new File(fsr.getFile(),path.substring(path.lastIndexOf(File.separator)));
+						newFile.mkdir();
+						return newFile;
+					}
+					else{
+						if(path.startsWith("/") || path.charAt(1)==':'){
+							throw new IOException("Parent folder not found for creating the file.");
+						}
+						//Network storage
+						UrlResource ur = new UrlResource(parentPath);
+						if(ur!=null && ur.exists()){
+							File newFile = new File(ur.getFile(),path.substring(path.lastIndexOf(File.separator)));
+							newFile.mkdir();
+							return newFile;
+						}
+						else{
+							throw new IOException("Network file not found or not accesible.");
+						}
+					}
+				}
+			}
 		}
 	}
 }
