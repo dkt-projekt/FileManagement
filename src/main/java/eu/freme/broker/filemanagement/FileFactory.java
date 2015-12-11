@@ -90,19 +90,29 @@ public class FileFactory {
 				throw new IOException("FTP file generation not implemented yet.");
 			}
 			else{
+//				System.out.println(parentPath);
 				//The rest of the possibilities: classpath, filesystem or network storage
 				ClassPathResource cpr = new ClassPathResource(parentPath);
 				if(cpr!=null && cpr.exists()){
+//					System.out.println(path.substring(path.lastIndexOf(File.separator)));
 					File newFile = new File(cpr.getFile(),path.substring(path.lastIndexOf(File.separator)));
-					newFile.createNewFile();
-					return newFile;
+					if(newFile.createNewFile()){
+						return newFile;
+					}
+					else{
+						throw new IOException("Unable to generate file: "+newFile.getAbsolutePath());
+					}
 				}
 				else{
-					FileSystemResource fsr = new FileSystemResource(path);
+					FileSystemResource fsr = new FileSystemResource(parentPath);
 					if(fsr!=null && fsr.exists()){
 						File newFile = new File(fsr.getFile(),path.substring(path.lastIndexOf(File.separator)));
-						newFile.createNewFile();
-						return newFile;
+						if(newFile.createNewFile()){
+							return newFile;
+						}
+						else{
+							throw new IOException("Unable to generate file: "+newFile.getAbsolutePath());
+						}
 					}
 					else{
 						if(path.startsWith("/") || path.charAt(1)==':'){
@@ -112,8 +122,12 @@ public class FileFactory {
 						UrlResource ur = new UrlResource(parentPath);
 						if(ur!=null && ur.exists()){
 							File newFile = new File(ur.getFile(),path.substring(path.lastIndexOf(File.separator)));
-							newFile.createNewFile();
-							return newFile;
+							if(newFile.createNewFile()){
+								return newFile;
+							}
+							else{
+								throw new IOException("Unable to generate file: "+newFile.getAbsolutePath());
+							}
 						}
 						else{
 							throw new IOException("Network file not found or not accesible.");
@@ -157,15 +171,23 @@ public class FileFactory {
 				ClassPathResource cpr = new ClassPathResource(parentPath);
 				if(cpr!=null && cpr.exists()){
 					File newFile = new File(cpr.getFile(),path.substring(path.lastIndexOf(File.separator)));
-					newFile.mkdir();
-					return newFile;
+					if(newFile.mkdir()){
+						return newFile;
+					}
+					else{
+						throw new IOException("Unable to generate directory: "+newFile.getAbsolutePath());
+					}
 				}
 				else{
-					FileSystemResource fsr = new FileSystemResource(path);
+					FileSystemResource fsr = new FileSystemResource(parentPath);
 					if(fsr!=null && fsr.exists()){
 						File newFile = new File(fsr.getFile(),path.substring(path.lastIndexOf(File.separator)));
-						newFile.mkdir();
-						return newFile;
+						if(newFile.mkdir()){
+							return newFile;
+						}
+						else{
+							throw new IOException("Unable to generate directory: "+newFile.getAbsolutePath());
+						}
 					}
 					else{
 						if(path.startsWith("/") || path.charAt(1)==':'){
@@ -175,8 +197,12 @@ public class FileFactory {
 						UrlResource ur = new UrlResource(parentPath);
 						if(ur!=null && ur.exists()){
 							File newFile = new File(ur.getFile(),path.substring(path.lastIndexOf(File.separator)));
-							newFile.mkdir();
-							return newFile;
+							if(newFile.mkdir()){
+								return newFile;
+							}
+							else{
+								throw new IOException("Unable to generate directory: "+newFile.getAbsolutePath());
+							}
 						}
 						else{
 							throw new IOException("Network file not found or not accesible.");
