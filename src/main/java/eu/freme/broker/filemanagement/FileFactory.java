@@ -48,16 +48,16 @@ public class FileFactory {
 					}
 					else{
 						if(path.startsWith("/") || path.charAt(1)==':'){
-							return null;
+							//Network storage
+							UrlResource ur = new UrlResource(path);
+							if(ur!=null && ur.exists()){
+								return ur.getFile();
+							}
+							else{
+								throw new IOException("Network file not found or not accesible.");
+							}
 						}
-						//Network storage
-						UrlResource ur = new UrlResource(path);
-						if(ur!=null && ur.exists()){
-							return ur.getFile();
-						}
-						else{
-							throw new IOException("Network file not found or not accesible.");
-						}
+						throw new IOException("File not found.");
 					}
 				}
 			}
